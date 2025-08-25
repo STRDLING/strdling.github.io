@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>10 Controls</title>
+    <link rel="icon" type="image/png" href="images/10c.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(to bottom, #492833, #201C1C);
+            min-height: 100vh;
+            display: flex; /* Make body a flex container */
+            flex-direction: column; /* Stack children vertically */
+        }
+        .footer {
+            background-color: #492833;
+            color: white;
+            text-align: center;
+            padding: 2rem 1rem;
+        }
+        .schedule-card {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+        .schedule-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        #mobile-menu {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out;
+            position: absolute;
+            width: 100%;
+            left: 0;
+            top: 100%;
+            background-color: #492833;
+        }
+
+        #mobile-menu.menu-open {
+            max-height: 25rem;
+            opacity: 1;
+        }
+
+        #desktop-menu-items {
+            position: relative;
+        }
+
+        #sliding-highlighter {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 100%;
+            background-color: #492833;
+            border-radius: 0.375rem;
+            transition: left 0.3s ease-in-out, width 0.3s ease-in-out;
+            z-index: -1;
+        }
+        
+        .hamburger-icon span {
+            display: block;
+            width: 24px;
+            height: 2px;
+            background-color: white;
+            transition: all 0.3s cubic-bezier(.08,.82,.17,1);
+        }
+
+        #mobile-menu-button.open .hamburger-icon span:nth-child(1) {
+            transform: translateY(10px) rotate(45deg);
+        }
+
+        #mobile-menu-button.open .hamburger-icon span:nth-child(2) {
+            opacity: 0;
+        }
+
+        #mobile-menu-button.open .hamburger-icon span:nth-child(3) {
+            transform: translateY(-10px) rotate(-45deg);
+        }
+
+        .mobile-menu-link {
+            background-color: #492833;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .mobile-menu-link:hover {
+            background-color: #000000;
+        }
+        .driver-flag {
+            width: 20px;
+            height: 16px;
+            border: 1px solid #be8190;
+            border-radius: 2px;
+            object-fit: cover;
+            display: inline-block;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        .team-logo {
+            height: 32px;
+            width: auto;
+        }
+        .driver-name-link {
+            cursor: pointer;
+            text-decoration: underline;
+            transition: color 0.2s ease-in-out;
+        }
+        .driver-name-link:hover {
+            color: #d1d5db; /* Light gray on hover */
+        }
+        /* New style for tier group headings (kept for driver profile, though not used on team cards anymore) */
+        .tier-group-heading {
+            font-size: 0.75rem; /* text-xs */
+            font-weight: 600; /* font-semibold */
+            padding: 0.25rem 0.75rem; /* px-3 py-1 */
+            border-radius: 9999px; /* rounded-full */
+            color: white;
+            display: inline-block; /* Allows background to wrap content snugly */
+            margin-bottom: 0.5rem; /* mb-2 */
+            width: fit-content; /* Ensure it wraps content */
+        }
+        /* Style for the championship icon */
+        .championship-icon {
+            width: 32px; /* Increased size */
+            height: 32px; /* Increased size */
+            object-fit: contain;
+        }
+
+        /* New style for glowing championship box */
+        .championship-glow {
+            box-shadow: 0 0 15px 5px rgba(211, 175, 55, 0.7); /* Gold glow with new color */
+            transition: box-shadow 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="bg-black/70 backdrop-blur-sm sticky top-0 z-50 shadow-lg">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex-shrink-0">
+                    <a href="index.html">
+                        <img src="images/10c.png" alt="10 Controls Logo" class="h-10">
+                    </a>
+                </div>
+
+                <div id="desktop-menu-items" class="hidden md:flex items-center space-x-4">
+                    <div id="sliding-highlighter"></div>
+                    <a href="index.html" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium relative z-10">Latest</a>
+                    <a href="schedule.html" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium relative z-10">Schedule</a>
+                    <a href="standings.html" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium relative z-10">Standings</a>
+                    <a href="teams.html" class="text-white px-3 py-2 rounded-md text-sm font-medium relative z-10" aria-current="page">Teams</a>
+                </div>
+
+                <div class="-mr-2 flex md:hidden">
+                    <button type="button" id="mobile-menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-white focus:outline-none" style="background-color: #492833;">
+                        <span class="sr-only">Open main menu</span>
+                        <div class="hamburger-icon space-y-2">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </nav>
+        <div class="md:hidden" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <a href="index.html" class="text-white block px-3 py-2 rounded-md text-base font-medium mobile-menu-link">Latest</a>
+                <a href="schedule.html" class="text-white block px-3 py-2 rounded-md text-base font-medium mobile-menu-link">Schedule</a>
+                <a href="standings.html" class="text-white block px-3 py-2 rounded-md text-base font-medium mobile-menu-link">Standings</a>
+                <a href="teams.html" class="text-white block px-3 py-2 rounded-md text-base font-medium mobile-menu-link" aria-current="page">Teams</a>
+            </div>
+        </div>
+    </header>
+
+
+
+    <!-- Main content area that will grow to push footers down -->
+    <main class="flex-grow">
+        <div id="teams-banner" class="relative w-full h-72 bg-cover bg-center flex flex-col items-center justify-center text-center" style="background-image: url('https://thehenrym.github.io/images/10.png');">
+            <h1 class="text-white text-7xl font-bold z-10">TEAMS</h1>
+            <p class="text-white text-xl font-semibold z-10 mt-2">10 CONTROLS SEASON 7</p>
+            <div class="absolute inset-0 bg-black opacity-50"></div>
+        </div>
+
+        <div class="relative max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 flex flex-col items-center">
+            <div class="py-8 flex flex-col md:flex-row justify-start items-center gap-4 w-full">
+                <!-- This div will contain either the search bar or will be empty when showing driver profile -->
+                <div id="dynamic-controls-container" class="flex items-center w-full md:w-1/3">
+                    <input type="text" id="driver-search" placeholder="SEARCH DRIVERS OR TEAM PRINCIPALS..."
+                            class="p-2 rounded-md bg-[#492833] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400 w-full border-2 border-[#A0A0A0]">
+                </div>
+            </div>
+            
+            <div id="schedule-grid" class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
+                <!-- Team cards or driver profile will be rendered here -->
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-black text-white text-center py-5 px-2 mt-8">
+        <div class="max-w-7xl mx-auto flex justify-center items-center space-x-6">
+            <a href="https://www.twitch.tv/10controls" target="_blank" rel="noopener noreferrer" class="text-white hover:text-gray-300 transition-colors" aria-label="Twitch"><i class="fab fa-twitch fa-lg"></i></a>
+            <a href="https://www.instagram.com/10controls/" target="_blank" rel="noopener noreferrer" class="text-white hover:text-gray-300 transition-colors" aria-label="Instagram"><i class="fab fa-instagram fa-lg"></i></a>
+            <a href="https://www.youtube.com/@10controls24" target="_blank" rel="noopener noreferrer" class="text-white hover:text-gray-300 transition-colors" aria-label="YouTube"><i class="fab fa-youtube fa-lg"></i></a>
+        </div>
+    </footer>
+    
+    <footer class="footer">
+        <p>© 2022-2025 10 Controls Limited</p>
+    </footer>
+    
+    <script>
+        // Data for teams and races
+        const teamData = [
+  {
+    id: 'ferrari-card',
+    name: 'Pirelli Ferrari',
+    venue: 'Maranello',
+    drivers: [
+      { name: 'ALPHAROMEO', flagCountryCode: 'NL' },
+      { name: 'ANTONIO BRANCATI', flagCountryCode: 'IT' }
+    ],
+    country: 'IT',
+    bgColor: '#821729',
+    textColor: 'text-white',
+    carImageUrl: 'https://media.formula1.com/image/upload/c_lfill,h_224/q_auto/d_common:f1:2025:fallback:car:2025fallbackcarright.webp/v1740000000/common/f1/2025/ferrari/2025ferraricarright.webp',
+    borderColor: '#A0A0A0',
+    teamPrincipal: 'Manuel Rotundo',
+    teamPrincipalFlagCode: 'IT'
+  },
+  {
+    id: 'mercedes-card',
+    name: 'GUINNESS MERCEDES',
+    venue: 'Brackley',
+    drivers: [
+      { name: 'TSAR', flagCountryCode: 'HU' },
+    ],
+    country: 'GB',
+    bgColor: '#C8CCCE',
+    textColor: 'text-black',
+    carImageUrl: 'https://media.formula1.com/image/upload/c_lfill,h_224/q_auto/d_common:f1:2025:fallback:car:2025fallbackcarright.webp/v1740000000/common/f1/2025/mercedes/2025mercedescarright.webp',
+    borderColor: '#A0A0A0',
+    teamPrincipal: 'CHIZZ',
+    teamPrincipalFlagCode: 'GB'
+  },
+  {
+    id: 'redbull-card',
+    name: 'NEWPORT ROLEX RED BULL RACING',
+    venue: 'Milton Keynes',
+    drivers: [
+      { name: 'JAY AZIER', flagCountryCode: 'NL' },
+      { name: 'MAX AMMERLAAN', flagCountryCode: 'NL' }
+    ],
+    country: 'AT',
+    bgColor: '#003773',
+    textColor: 'text-white',
+    carImageUrl: 'https://media.formula1.com/image/upload/c_lfill,h_224/q_auto/d_common:f1:2025:fallback:car:2025fallbackcarright.webp/v1740000000/common/f1/2025/redbullracing/2025redbullracingcarright.webp',
+    borderColor: '#A0A0A0',
+    teamPrincipal: 'MAURITS',
+    teamPrincipalFlagCode: 'NL'
+  },
+  {
+    id: 'mclaren-card',
+    name: 'HOT WHEELS MCLAREN',
+    venue: 'Woking',
+    drivers: [
+      { name: 'ALFIE WHITE', flagCountryCode: 'GB' },
+      { name: 'ANTON CHEBOTAROV', flagCountryCode: 'UA' },
+      { name: 'ASPEC', flagCountryCode: 'GB' },
+    ],
+    country: 'GB',
+    bgColor: '#F47600',
+    textColor: 'text-black',
+    carImageUrl: 'https://media.formula1.com/image/upload/c_lfill,h_224/q_auto/d_common:f1:2025:fallback:car:2025fallbackcarright.webp/v1740000000/common/f1/2025/mclaren/2025mclarencarright.webp',
+    borderColor: '#A0A0A0',
+    teamPrincipal: 'CAMPINA',
+    teamPrincipalFlagCode: 'GB'
+  },
+  {
+    id: 'astonmartin-card',
+    name: 'Lockheed Martin Aston Martin',
+    venue: 'Silverstone',
+    drivers: [
+      { name: 'EDGE', flagCountryCode: 'GB' }
+    ],
+    country: 'GB',
+    bgColor: '#037A68',
+    textColor: 'text-white',
+    carImageUrl: 'https://media.formula1.com/image/upload/c_lfill,h_224/q_auto/d_common:f1:2025:fallback:car:2025fallbackcarright.webp/v1740000000/common/f1/2025/astonmartin/2025astonmartincarright.webp',
+    borderColor: '#A0A0A0',
+    teamPrincipal: 'AKIEUSH',
+    teamPrincipalFlagCode: 'PL'
+  },
+  {
+    id: 'alpine-card',
+    name: 'HONDA ALPINE',
+    venue: 'Enstone',
+    drivers: [
+      { name: 'TOBOB', flagCountryCode: 'DE' },
+      { name: 'GENERIC LEON', flagCountryCode: 'AT' },
+      { name: 'HAILEE', flagCountryCode: 'NL' }
+    ],
+    country: 'FR',
+    bgColor: '#F282B4',
+    textColor: 'text-black',
+    carImageUrl: 'https://media.formula1.com/image/upload/c_lfill,h_224/q_auto/d_common:f1:2025:fallback:car:2025fallbackcarright.webp/v1740000000/common/f1/2025/alpine/2025alpinecarright.webp',
+    borderColor: '#A0A0A0',
+    teamPrincipal: 'PHOENIX',
+    teamPrincipalFlagCode: 'US'
+  },
+  {
+    id: 'williams-card',
+    name: 'BMW Williams',
+    venue: 'Grove',
+    drivers: [
+      { name: 'COUNTERFEIT', flagCountryCode: 'GB' },
+      { name: 'LUCA STEVENS', flagCountryCode: 'GB' },
+      { name: 'MARK', flagCountryCode: 'US' },
+      { name: 'LEON', flagCountryCode: 'UA' }
+    ],
+    country: 'GB',
+    bgColor: '#0065b1',
+    textColor: 'text-white',
+    carImageUrl: 'https://media.formula1.com/image/upload/c_lfill,h_224/q_auto/d_common:f1:2025:fallback:car:2025fallbackcarright.webp/v1740000000/common/f1/2025/williams/2025williamscarright.webp',
+    borderColor: '#A0A0A0',
+    teamPrincipal: 'HENRY STRADLING',
+    teamPrincipalFlagCode: 'US'
+  },
+  {
+    id: 'rb-card',
+    name: 'RACING BULLS PEUGEOT SPORT',
+    venue: 'Faenza',
+    drivers: [
+      { name: 'MAXFAN', flagCountryCode: 'PL' },
+      { name: 'FOCUSER', flagCountryCode: 'ES' }
+    ],
+    country: 'IT',
+    bgColor: '#bbda0c',
+    textColor: 'text-black',
+    carImageUrl: 'https://media.formula1.com/image/upload/c_lfill,h_224/q_auto/d_common:f1:2025:fallback:car:2025fallbackcarright.webp/v1740000000/common/f1/2025/racingbulls/2025racingbullscarright.webp',
+    borderColor: '#A0A0A0',
+    teamPrincipal: 'JAUME GENARO',
+    teamPrincipalFlagCode: 'NL'
+  },
+  {
+    id: 'sauber-card',
+    name: 'VOLKSWAGEN SAUBER',
+    venue: 'Hinwil',
+    drivers: [
+      { name: 'JOIKER', flagCountryCode: 'RO' },
+      { name: 'MAX HOUSLEY', flagCountryCode: 'GB' },
+      { name: 'BABY YODA', flagCountryCode: 'GB' }
+    ],
+    country: 'CH',
+    bgColor: '#00e701',
+    textColor: 'text-black',
+    carImageUrl: 'https://media.formula1.com/image/upload/c_lfill,h_224/q_auto/d_common:f1:2025:fallback:car:2025fallbackcarright.webp/v1740000000/common/f1/2025/kicksauber/2025kicksaubercarright.webp',
+    borderColor: '#A0A0A0',
+    teamPrincipal: 'ARION',
+    teamPrincipalFlagCode: 'AL'
+  },
+  {
+    id: 'haas-card',
+    name: 'HAAS ONLYFANS RACING',
+    venue: 'Kannapolis',
+    drivers: [
+      { name: 'SANDRO', flagCountryCode: 'NL' },
+      { name: 'SHADOWBORN', flagCountryCode: 'DE' },
+      { name: 'DANOTTOK', flagCountryCode: 'FI' }
+    ],
+    country: 'USA',
+    bgColor: '#00AFF0',
+    textColor: 'text-white',
+    carImageUrl: 'https://media.formula1.com/image/upload/c_lfill,h_224/q_auto/d_common:f1:2025:fallback:car:2025fallbackcarright.webp/v1740000000/common/f1/2025/haas/2025haascarright.webp',
+    borderColor: '#A0A0A0',
+    teamPrincipal: 'MAX AMMERLAAN',
+    teamPrincipalFlagCode: 'NL'
+  }
+];
+
+        const raceScheduleData = [
+            { round: 1, name: 'Australian Grand Prix', venue: 'Melbourne', date: 'March 14-16', winner: 'Lando Norris', country: 'AU' },
+            { round: 2, name: 'Chinese Grand Prix', venue: 'Shanghai', date: 'March 21-23', winner: 'Oscar Piastri', country: 'CN' },
+            { round: 3, name: 'Japanese Grand Prix', venue: 'Suzuka', date: 'April 4-6', winner: 'Max Verstappen', country: 'JP' },
+            { round: 4, name: 'Bahrain Grand Prix', venue: 'Sakhir', date: 'April 11-13', winner: 'Oscar Piastri', country: 'BH' },
+            { round: 5, name: 'Saudi Arabian Grand Prix', venue: 'Jeddah', date: 'April 18-20', winner: 'Oscar Piastri', country: 'SA' },
+            { round: 6, name: 'Miami Grand Prix', venue: 'Miami', date: 'May 2-4', winner: 'Oscar Piastri', country: 'USA' },
+            { round: 7, name: 'Emilia Romagna Grand Prix', venue: 'Imola', date: 'May 16-18', winner: 'Max Verstappen', country: 'IT' },
+            { round: 8, name: 'Monaco Grand Prix', venue: 'Monaco', date: 'May 23-25', winner: 'Lando Norris', country: 'MC' },
+            { round: 9, name: 'Spanish Grand Prix', venue: 'Barcelona', date: 'July 11th', country: 'ES' },
+            { round: 10, name: 'Canadian Grand Prix', venue: 'Montreal', date: 'June 13-15', winner: 'George Russell', country: 'CA' },
+            { round: 11, name: 'Emilia Romagna Grand Prix', venue: 'Imola', date: 'June 27th', country: 'IT' },
+            { round: 12, name: 'Belgian Grand Prix', venue: 'Spa', date: 'July 4th', country: 'BE' },
+            { round: 13, name: 'Chinese Grand Prix', venue: 'Shanghai', date: 'July 18th', country: 'CN' },
+            { round: 14, name: 'Japanese Grand Prix', venue: 'Zandvoort', date: 'July 25th', country: 'NL' },
+            { round: 15, name: 'Brazilian Grand Prix', venue: 'Monza', date: 'August 1st', country: 'IT' },
+            { round: 16, name: 'Azerbaijan Grand Prix', venue: 'Baku', date: 'August 8th', country: 'AZ' },
+            { round: 17, name: 'Singapore Grand Prix', venue: 'Singapore', date: 'August 15th', country: 'SG' },
+            { round: 18, name: 'United States Grand Prix', venue: 'Austin', date: 'August 22nd', country: 'USA' },
+            { round: 19, name: 'Mexican Grand Prix', venue: 'Mexico City', date: 'August 29th', country: 'MX' },
+            { round: 20, name: 'Brazilian Grand Prix', venue: 'Interlagos', date: 'September 5th', country: 'BR' },
+            { round: 21, name: 'Las Vegas Grand Prix', venue: 'Las Vegas', date: 'September 12th', country: 'USA' },
+            { round: 22, name: 'Qatar Grand Prix', venue: 'Lusail', date: 'September 19th', country: 'QAT' },
+            { round: 23, name: 'Abu Dhabi Grand Prix', venue: 'Yas Marina', date: 'September 26th', country: 'AE' }
+        ];
+        
+        // Mapping from country codes to full country names
+        const countryCodeToFullNameMap = {
+            'NL': 'NETHERLANDS', 'IT': 'ITALY', 'HU': 'HUNGARY', 'RO': 'ROMANIA',
+            'GB': 'UNITED KINGDOM', 'GR': 'GREECE', 'PL': 'POLAND', 'ES': 'SPAIN',
+            'UA': 'UKRAINE', 'RS': 'SERBIA', 'PK': 'PAKISTAN', 'EU': 'EUROPE',
+            'AT': 'AUSTRIA', 'DE': 'GERMANY', 'LT': 'LITHUANIA', 'FI': 'FINLAND',
+            'US': 'UNITED STATES', 'CH': 'SWITZERLAND', 'FR': 'FRANCE', 'BR': 'BRAZIL',
+            'CA': 'CANADA', 'MX': 'MEXICO', 'QAT': 'QATAR', 'AE': 'UNITED ARAB EMIRATES',
+            'AU': 'AUSTRALIA', 'CN': 'CHINA', 'JP': 'JAPAN', 'BH': 'BAHRAIN',
+            'SA': 'SAUDI ARABIA', 'MC': 'MONACO', 'AZ': 'AZERBAIJAN', 'SG': 'SINGAPORE',
+            'BE': 'BELGIUM', 'USA': 'UNITED STATES'
+        };
+
+        // Comprehensive data for individual drivers and team principals
+        const allDriversData = {
+            'ALPHAROMEO': { name: 'ALPHAROMEO', team: 'Pirelli Ferrari', carNumber: 1, country: 'NETHERLANDS', podiums: 28, championships: 1, image: 'https://placehold.co/400x400/821729/FFFFFF?text=ALPHAROMEO', bio: '', stats: { racesStarted: 61, wins: 10, poles: 6, dnfs: 5 }, flagCountryCode: 'NL' },
+            'ANTONIO BRANCATI': { name: 'ANTONIO BRANCATI', team: 'Pirelli Ferrari', carNumber: 2, country: 'ITALY', podiums: 13, championships: 0, image: 'https://placehold.co/400x400/821729/FFFFFF?text=ANTONIO+BRANCATI', bio: '', stats: { racesStarted: 50, wins: 4, poles: 5, dnfs: 12 }, flagCountryCode: 'IT' },
+            'JSTN NL': { name: 'JSTN NL', team: 'Pirelli Ferrari', carNumber: 3, country: 'NETHERLANDS', podiums: 18, championships: 0, image: 'https://placehold.co/400x400/821729/FFFFFF?text=JSTN+NL', bio: '', stats: { racesStarted: 48, wins: 5, poles: 5, dnfs: 14 }, flagCountryCode: 'NL' },
+            'MANUEL ROTUNDO': { name: 'MANUEL ROTUNDO', team: 'Pirelli Ferrari', carNumber: 'TP', country: 'ITALY', podiums: 0, championships: 0, image: 'https://media.formula1.com/image/upload/c_lfill,h_224/q_auto/d_common:f1:2025:fallback:car:2025fallbackcarright.webp/v1740000000/common/f1/2025/ferrari/2025ferraricarright.webp', bio: '', stats: { racesStarted: 0, wins: 0, poles: 0, dnfs: 0 }, tier: 'TEAM PRINCIPAL', flagCountryCode: 'IT', isTeamPrincipal: true },
+            'TSAR': { name: 'TSAR', team: 'GUINNESS MERCEDES', carNumber: 5, country: 'HUNGARY', podiums: 1, championships: 0, image: 'https://placehold.co/400x400/C8CCCE/000000?text=TSAR', bio: '', stats: { racesStarted: 12, wins: 1, poles: 0, dnfs: 5 }, flagCountryCode: 'HU' },
+            'JOKER': { name: 'JOKER', team: 'GUINNESS MERCEDES', carNumber: 6, country: 'ROMANIA', podiums: 0, championships: 0, image: 'https://placehold.co/400x400/C8CCCE/000000?text=JOKER', bio: '', stats: { racesStarted: 1, wins: 0, poles: 0, dnfs: 0 }, flagCountryCode: 'RO' },
+            'ASPEC': { name: 'ASPEC', team: 'HOT WHEELS MCLAREN', carNumber: 7, country: 'UNITED KINGDOM', podiums: 1, championships: 0, image: 'https://placehold.co/400x400/C8CCCE/000000?text=ASPEC', bio: '', stats: { racesStarted: 9, wins: 2, poles: 1, dnfs: 1 }, flagCountryCode: 'GB' },
+            'BYRONAS': { name: 'BYRONAS', team: 'GUINNESS MERCEDES', carNumber: 8, country: 'GREECE', podiums: 0, championships: 0, image: 'https://placehold.co/400x400/C8CCCE/000000?text=BYRONAS', bio: '', stats: { racesStarted: 4, wins: 0, poles: 0, dnfs: 0 }, flagCountryCode: 'GR' },
+            'CHIZZ': { name: 'CHIZZ', team: 'GUINNESS MERCEDES', carNumber: 'TP', country: 'UNITED KINGDOM', podiums: 0, championships: 0, image: 'https://media.formula1.com/image/upload/c_lfill,h_224/q_auto/d_common:f1:2025:fallback:car:2025fallbackcarright.webp/v1740000000/common/f1/2025/mercedes/2025mercedescarright.webp', bio: '', stats: { racesStarted: 0, wins: 0, poles: 0, dnfs: 0 }, tier: 'TEAM PRINCIPAL', flagCountryCode: 'GB', isTeamPrincipal: true },
+            'MAXFAN': { name: 'MAXFAN', team: 'RACING BULLS PEUGEOT SPORT', carNumber: 9, country: 'POLAND', podiums: 10, championships: 1, image: 'https://placehold.co/400x400/003773/FFFFFF?text=MAXFAN', bio: '', stats: { racesStarted: 76, wins: 7, poles: 5, dnfs: 15 }, flagCountryCode: 'PL' },
+            'TONY SEROKA': { name: 'TONY SEROKA', team: 'NEWPORT ROLEX RED BULL RACING', carNumber: 10, country: 'POLAND', podiums: 2, championships: 0, image: 'https://placehold.co/400x400/003773/FFFFFF?text=TONY+SEROKA', bio: '', stats: { racesStarted: 15, wins: 1, poles: 2, dnfs: 3 }, flagCountryCode: 'PL' },
+            'JARVIS COID': { name: 'JARVIS COID', team: 'NEWPORT ROLEX RED BULL RACING', carNumber: 11, country: 'UNITED KINGDOM', podiums: 2, championships: 0, image: 'https://placehold.co/400x400/003773/FFFFFF?text=JARVIS+COID', bio: '', stats: { racesStarted: 6, wins: 0, poles: 0, dnfs: 0 }, flagCountryCode: 'GB' },
+            'TEETOE': { name: 'TEETOE', team: 'NEWPORT ROLEX RED BULL RACING', carNumber: 12, country: 'NETHERLANDS', podiums: 6, championships: 0, image: 'https://placehold.co/400x400/003773/FFFFFF?text=TEETOE', bio: '', stats: { racesStarted: 39, wins: 1, poles: 1, dnfs: 2 }, flagCountryCode: 'NL' },
+            'MAURITS': { name: 'MAURITS', team: 'NEWPORT ROLEX RED BULL RACING', carNumber: 'TP', country: 'NETHERLANDS', podiums: 0, championships: 0, image: 'https://media.formula1.com/image/upload/c_lfill,h_224/q_auto/d_common:f1:2025:fallback:car:2025fallbackcarright.webp/v1740000000/common/f1/2025/redbullracing/2025redbullracingcarright.webp', bio: '', stats: { racesStarted: 0, wins: 0, poles: 0, dnfs: 0 }, tier: 'TEAM PRINCIPAL', flagCountryCode: 'NL', isTeamPrincipal: true },
+            'FOCUSER': { name: 'FOCUSER', team: 'RACING BULLS PEUGEOT SPORT', carNumber: 13, country: 'SPAIN', podiums: 18, championships: 1, image: 'https://placehold.co/400x400/F47600/000000?text=FOCUSER', bio: '', stats: { racesStarted: 70, wins: 3, poles: 6, dnfs: 1 }, flagCountryCode: 'ES' },
+            'JOIKER': { name: 'JOIKER', team: 'VOLKSWAGEN SAUBER', carNumber: 13, country: 'ROMANIA', podiums: 1, championships: 0, image: 'https://placehold.co/400x400/F47600/000000?text=JOIKER', bio: '', stats: { racesStarted: 1, wins: 0, poles: 0, dnfs: 0 }, flagCountryCode: 'ES' },
+            'ANTON CHEBOTAROV': { name: 'ANTON CHEBOTAROV', team: 'HOT WHEELS MCLAREN', carNumber: 14, country: 'UKRAINE', podiums: 17, championships: 0, image: 'https://placehold.co/400x400/F47600/000000?text=ANTON+CHEBOTAROV', bio: '', stats: { racesStarted: 62, wins: 7, poles: 7, dnfs: 6 }, flagCountryCode: 'UA' },
+            'SANDRO': { name: 'SANDRO', team: 'HAAS ONLYFANS RACING', carNumber: 15, country: 'NETHERLANDS', podiums: 5, championships: 1, image: 'https://placehold.co/400x400/F47600/000000?text=SANDRO', bio: '', stats: { racesStarted: 16, wins: 8, poles: 12, dnfs: 0 }, flagCountryCode: 'NL' },
+            'JAY AZIER': { name: 'JAY AZIER', team: 'NEWPORT ROLEX RED BULL RACING', carNumber: 16, country: 'NETHERLANDS', podiums: 11, championships: 1, image: 'https://placehold.co/400x400/F47600/000000?text=JAY+AZIER', bio: '', stats: { racesStarted: 22, wins: 4, poles: 1, dnfs: 4 }, flagCountryCode: 'NL' },
+            'CAMPINA': { name: 'CAMPINA', team: 'HOT WHEELS MCLAREN', carNumber: 'TP', country: 'UNITED KINGDOM', podiums: 1, championships: 0, image: 'https://media.formula1.com/image/upload/c_lfill,h_224/q_auto/d_common:f1:2025:fallback:car:2025fallbackcarright.webp/v1740000000/common/f1/2025/mclaren/2025mclarencarright.webp', bio: '', stats: { racesStarted: 1, wins: 0, poles: 0, dnfs: 0 }, tier: 'TEAM PRINCIPAL', flagCountryCode: 'GB', isTeamPrincipal: true },
+            'STRA': { name: 'STRA', team: 'Lockheed Martin Aston Martin', carNumber: 17, country: 'SERBIA', podiums: 3, championships: 0, image: 'https://placehold.co/400x400/037A68/FFFFFF?text=STRA', bio: '', stats: { racesStarted: 51, wins: 0, poles: 0, dnfs: 14 }, flagCountryCode: 'RS' },
+            'SHARK': { name: 'SHARK', team: 'Lockheed Martin Aston Martin', carNumber: 19, country: 'PAKISTAN', podiums: 0, championships: 0, image: 'https://placehold.co/400x400/037A68/FFFFFF?text=SHARK', bio: '', stats: { racesStarted: 6, wins: 0, poles: 0, dnfs: 1 }, flagCountryCode: 'PK' },
+            'EDGE': { name: 'EDGE', team: 'Lockheed Martin Aston Martin', carNumber: 20, country: 'UNITED KINGDOM', podiums: 0, championships: 0, image: 'https://placehold.co/400x400/037A68/FFFFFF?text=EDGE', bio: '', stats: { racesStarted: 4, wins: 0, poles: 0, dnfs: 1 }, flagCountryCode: 'GB' },
+            'AKIEUSH': { name: 'AKIEUSH', team: 'Lockheed Martin Aston Martin', carNumber: 'TP', country: 'POLAND', podiums: 0, championships: 0, image: 'https://media.formula1.com/image/upload/c_lfill,h_224/q_auto/d_common:f1:2025:fallback:car:2025fallbackcarright.webp/v1740000000/common/f1/2025/astonmartin/2025astonmartincarright.webp', bio: '', stats: { racesStarted: 5, wins: 0, poles: 0, dnfs: 0 }, tier: 'TEAM PRINCIPAL', flagCountryCode: 'PL', isTeamPrincipal: true },
+            'MAX HOUSLEY': { name: 'MAX HOUSLEY', team: 'VOLKSWAGEN SAUBER', carNumber: 21, country: 'UNITED KINGDOM', podiums: 7, championships: 0, image: 'https://placehold.co/400x400/F282B4/000000?text=MAX+HOUSLEY', bio: '', stats: { racesStarted: 21, wins: 2, poles: 0, dnfs: 2 }, flagCountryCode: 'GB' },
+            'ALFIE WHITE': { name: 'ALFIE WHITE', team: 'HOT WHEELS MCLAREN', carNumber: 22, country: 'UNITED KINGDOM', podiums: 1, championships: 0, image: 'https://placehold.co/400x400/F282B4/000000?text=ALFIE+WHITE', bio: '', stats: { racesStarted: 4, wins: 0, poles: 0, dnfs: 1 }, flagCountryCode: 'GB' },
+            'GIULIO': { name: 'GIULIO', team: 'Tinder Alpine F1 Team', carNumber: 23, country: 'ITALY', podiums: 0, championships: 0, image: 'https://placehold.co/400x400/F282B4/000000?text=GIULIO', bio: '', stats: { racesStarted: 4, wins: 0, poles: 0, dnfs: 0 }, flagCountryCode: 'IT' },
+            'JOEL FARR': { name: 'JOEL FARR', team: 'Alpine F1 Team', carNumber: 24, country: 'UNITED KINGDOM', podiums: 3, championships: 0, image: 'https://placehold.co/400x400/F282B4/000000?text=JOEL+FARR', bio: '', stats: { racesStarted: 12, wins: 0, poles: 0, dnfs: 3 }, flagCountryCode: 'GB' },
+            'SHADOWBORN': { name: 'SHADOWBORN', team: 'HAAS ONLYFANS RACING', carNumber: 25, country: 'GERMANY', podiums: 21, championships: 1, image: 'https://placehold.co/400x400/00AFF0/FFFFFF?text=SHADOWBORN', bio: '', stats: { racesStarted: 66, wins: 9, poles: 8, dnfs: 3 }, flagCountryCode: 'DE' },
+            'DANOTTOK': { name: 'DANOTTOK', team: 'HAAS ONLYFANS RACING', carNumber: 26, country: 'FINLAND', podiums: 1, championships: 0, image: 'https://placehold.co/400x400/00AFF0/FFFFFF?text=DANOTTOK', bio: '', stats: { racesStarted: 1, wins: 0, poles: 0, dnfs: 0 }, flagCountryCode: 'FI' },
+            'NICO B': { name: 'NICO B', team: 'Williams Racing', carNumber: 27, country: 'LITHUANIA', podiums: 1, championships: 0, image: 'https://placehold.co/400x400/0065b1/FFFFFF?text=NICO+B', bio: '', stats: { racesStarted: 7, wins: 0, poles: 0, dnfs: 1 }, flagCountryCode: 'LT' },
+            'HENRY STRADLING': { name: 'HENRY STRADLING', team: 'BMW Williams', carNumber: 'TP', country: 'UNITED STATES', podiums: 0, championships: 0, image: 'https://media.formula1.com/image/upload/c_lfill,h_224/q_auto/d_common:f1:2025:fallback:car:2025fallbackcarright.webp/v1740000000/common/f1/2025/williams/2025williamscarright.webp', bio: '', stats: { racesStarted: 0, wins: 0, poles: 0, dnfs: 0 }, tier: 'TEAM PRINCIPAL', flagCountryCode: 'US', isTeamPrincipal: true },
+            'PHOENIX': { name: 'PHOENIX', team: 'HONDA ALPINE', carNumber: 'TP', country: 'UNITED STATES', podiums: 0, championships: 0, image: 'https://media.formula1.com/image/upload/c_lfill,h_224/q_auto/d_common:f1:2025:fallback:car:2025fallbackcarright.webp/v1740000000/common/f1/2025/alpine/2025alpinecarright.webp', bio: '', stats: { racesStarted: 0, wins: 0, poles: 0, dnfs: 0 }, tier: 'TEAM PRINCIPAL', flagCountryCode: 'US', isTeamPrincipal: true },
+            'ARION': { name: 'ARION', team: 'VOLKSWAGEN SAUBER', carNumber: 'TP', country: 'SWITZERLAND', podiums: 0, championships: 0, image: 'https://media.formula1.com/image/upload/c_lfill,h_224/q_auto/d_common:f1:2025:fallback:car:2025fallbackcarright.webp/v1740000000/common/f1/2025/kicksauber/2025kicksaubercarright.webp', bio: '', stats: { racesStarted: 0, wins: 0, poles: 0, dnfs: 0 }, tier: 'TEAM PRINCIPAL', flagCountryCode: 'AL', isTeamPrincipal: true },
+            'BABY YODA': { name: 'BABY YODA', team: 'VOLKSWAGEN SAUBER', carNumber: 31, country: 'UNITED KINGDOM', podiums: 0, championships: 0, image: 'https://placehold.co/400x400/00e701/000000?text=BABY+YODA', bio: '', stats: { racesStarted: 1, wins: 0, poles: 0, dnfs: 0 }, flagCountryCode: 'GB' },
+            'LUCA STEVENS': { name: 'LUCA STEVENS', team: 'BMW Williams', carNumber: 32, country: 'UNITED KINGDOM', podiums: 0, championships: 0, image: 'https://placehold.co/400x400/0065b1/FFFFFF?text=LUCA+STEVENS', bio: '', stats: { racesStarted: 3, wins: 0, poles: 0, dnfs: 1 }, flagCountryCode: 'GB' },
+            'COUNTERFEIT': { name: 'COUNTERFEIT', team: 'BMW Williams', carNumber: 33, country: 'UNITED KINGDOM', podiums: 0, championships: 0, image: 'https://placehold.co/400x400/0065b1/FFFFFF?text=COUNTERFEIT', bio: '', stats: { racesStarted: 3, wins: 0, poles: 0, dnfs: 0 }, flagCountryCode: 'GB' },
+            'JAUME GENARO': { name: 'JAUME GENARO', team: 'RACING BULLS PEUGEOT SPORT', carNumber: 'TP', country: 'NETHERLANDS', podiums: 0, championships: 0, image: 'https://media.formula1.com/image/upload/c_lfill,h_224/q_auto/d_common:f1:2025:fallback:car:2025fallbackcarright.webp/v1740000000/common/f1/2025/racingbulls/2025racingbullscarright.webp', bio: '', stats: { racesStarted: 0, wins: 0, poles: 0, dnfs: 0 }, tier: 'TEAM PRINCIPAL', flagCountryCode: 'NL', isTeamPrincipal: true },
+            'TOBOB': { name: 'TOBOB', team: 'HONDA ALPINE', carNumber: 34, country: 'GERMANY', podiums: 0, championships: 0, image: 'https://placehold.co/400x400/F282B4/000000?text=TOBOB', bio: '', stats: { racesStarted: 3, wins: 0, poles: 0, dnfs: 0 }, flagCountryCode: 'DE' },
+            'MARK': { name: 'MARK', team: 'BMW Williams', carNumber: 35, country: 'UNITED STATES', podiums: 0, championships: 0, image: 'https://placehold.co/400x400/0065b1/FFFFFF?text=MARK', bio: '', stats: { racesStarted: 4, wins: 0, poles: 0, dnfs: 0 }, flagCountryCode: 'US' },
+            'LEON': { name: 'LEON', team: 'BMW Williams', carNumber: 36, country: 'UKRAINE', podiums: 0, championships: 0, image: 'https://placehold.co/400x400/0065b1/FFFFFF?text=LEON', bio: '', stats: { racesStarted: 2, wins: 0, poles: 0, dnfs: 0 }, flagCountryCode: 'UA' },
+            'GENERIC LEON': { name: 'GENERIC LEON', team: 'HONDA ALPINE', carNumber: 37, country: 'AUSTRIA', podiums: 0, championships: 0, image: 'https://placehold.co/400x400/F282B4/000000?text=GENERIC+LEON', bio: '', stats: { racesStarted: 1, wins: 0, poles: 0, dnfs: 0 }, flagCountryCode: 'AT' },
+            'HAILEE': { name: 'HAILEE', team: 'HONDA ALPINE', carNumber: 38, country: 'NETHERLANDS', podiums: 0, championships: 0, image: 'https://placehold.co/400x400/F282B4/000000?text=HAILEE', bio: '', stats: { racesStarted: 1, wins: 0, poles: 0, dnfs: 0 }, flagCountryCode: 'NL' }
+        };
+
+        const teamPrincipalInfo = {
+            'Manuel Rotundo': { team: 'Pirelli Ferrari', flag: 'IT' },
+            'CHIZZ': { team: 'GUINNESS MERCEDES', flag: 'GB' },
+            'MAURITS': { team: 'NEWPORT ROLEX RED BULL RACING', flag: 'NL' },
+            'CAMPINA': { team: 'HOT WHEELS MCLAREN', flag: 'GB' },
+            'AKIEUSH': { team: 'Lockheed Martin Aston Martin', flag: 'PL' },
+            'PHOENIX': { team: 'HONDA ALPINE', flag: 'US' },
+            'HENRY STRADLING': { team: 'BMW Williams', flag: 'US' },
+            'JAUME GENARO': { team: 'RACING BULLS PEUGEOT SPORT', flag: 'NL' },
+            'ARION': { team: 'VOLKSWAGEN SAUBER', flag: 'AL' },
+            'MAX AMMERLAAN': { team: 'HAAS ONLYFANS RACING', flag: 'NL' }
+        };
+        
+        // This function renders a single team card
+        function createTeamCard(team) {
+            const driversHtml = team.drivers.map(driver => `
+                <li class="flex items-center text-sm mb-1 text-gray-300">
+                    <img src="https://thehenrym.github.io/images/flags/${driver.flagCountryCode}.svg" alt="${driver.flagCountryCode} flag" class="driver-flag">
+                    <span class="driver-name-link font-medium">${driver.name}</span>
+                </li>
+            `).join('');
+
+            return `
+                <div id="${team.id}" class="team-card bg-[#201C1C] p-6 rounded-lg shadow-lg flex flex-col md:flex-row gap-6 items-center justify-between transition-all duration-300 transform hover:scale-[1.02] border-4 border-gray-400">
+                    <!-- Team Info Section -->
+                    <div class="flex-1 flex flex-col items-center md:items-start text-center md:text-left">
+                        <div class="flex items-center space-x-4 mb-4">
+                            <div class="w-16 h-16 rounded-full flex items-center justify-center" style="background-color: ${team.bgColor};">
+                                <img src="https://placehold.co/64x64/${team.bgColor.substring(1)}/${team.textColor.replace('text-', '')}?text=${team.name.split(' ').map(w => w[0]).join('').toUpperCase()}" alt="${team.name} Logo" class="w-12 h-12 rounded-full">
+                            </div>
+                            <div>
+                                <h2 class="text-3xl font-bold ${team.textColor}">${team.name}</h2>
+                                <p class="text-sm text-gray-400 mt-1">Base: ${team.venue} <img src="https://thehenrym.github.io/images/flags/${team.country}.svg" alt="${team.country} flag" class="driver-flag"></p>
+                            </div>
+                        </div>
+
+                        <div class="w-full mt-4">
+                            <h3 class="text-lg font-semibold text-white">DRIVERS</h3>
+                            <ul class="list-disc list-inside mt-2 space-y-1 w-full">
+                                ${driversHtml}
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- Team Principal and Car Image Section -->
+                    <div class="flex-shrink-0 flex flex-col items-center md:items-end text-center md:text-right">
+                        <div class="flex items-center space-x-2 mb-4">
+                            <h3 class="text-lg text-gray-300 font-semibold">TEAM PRINCIPAL:</h3>
+                            <div class="flex items-center">
+                                <img src="https://thehenrym.github.io/images/flags/${team.teamPrincipalFlagCode}.svg" alt="${team.teamPrincipalFlagCode} flag" class="driver-flag">
+                                <span class="text-white font-medium">${team.teamPrincipal}</span>
+                            </div>
+                        </div>
+                        <img src="${team.carImageUrl}" alt="${team.name} Car" class="w-64 h-auto object-cover rounded-lg">
+                    </div>
+                </div>
+            `;
+        }
+
+        // This is the new, combined function to render and filter teams
+        function renderTeams(searchTerm = '') {
+            const teamsGrid = document.getElementById('schedule-grid');
+            
+            // If the grid is empty, this is the initial page load. Render all teams once.
+            if (teamsGrid.innerHTML === '') {
+                teamData.forEach(team => {
+                    teamsGrid.insertAdjacentHTML('beforeend', createTeamCard(team));
+                });
+            }
+
+            // Now, filter the teams that are already on the page
+            const teamCards = document.querySelectorAll('.team-card');
+            const lowerCaseSearchTerm = searchTerm.toLowerCase();
+
+            teamCards.forEach(card => {
+                const teamName = card.querySelector('h2').textContent.toLowerCase();
+                const teamPrincipal = card.querySelector('.team-card .flex-shrink-0 > div:first-of-type span').textContent.toLowerCase();
+                const driverNames = Array.from(card.querySelectorAll('.driver-name-link')).map(el => el.textContent.toLowerCase());
+                
+                // Check if the search term is found in any of the relevant fields
+                const isMatch = teamName.includes(lowerCaseSearchTerm) ||
+                                teamPrincipal.includes(lowerCaseSearchTerm) ||
+                                driverNames.some(driverName => driverName.includes(lowerCaseSearchTerm));
+                
+                // Show or hide the card based on the match
+                if (isMatch) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // This function handles the rendering of the driver profile
+        function renderTeamProfile(driverName) {
+            // ... (rest of the renderTeamProfile function remains the same as in your original code)
+            const driver = allDriversData[driverName];
+            if (!driver) {
+                console.error('Driver not found:', driverName);
+                return;
+            }
+
+            const teamsGrid = document.getElementById('schedule-grid');
+            const dynamicControlsContainer = document.getElementById('dynamic-controls-container');
+            
+            dynamicControlsContainer.innerHTML = '';
+            teamsGrid.innerHTML = '';
+            
+            const isTeamPrincipal = driver.isTeamPrincipal || false;
+            
+            const driverBioHtml = `
+                <div class="w-full bg-[#201C1C] p-8 rounded-lg shadow-xl flex flex-col md:flex-row gap-8 text-white border-2 border-gray-400">
+                    <!-- Image and Basic Info Column -->
+                    <div class="flex-shrink-0 flex flex-col items-center w-full md:w-1/3">
+                        <img src="${driver.image}" alt="${driver.name}" class="w-full h-auto rounded-xl object-cover shadow-lg mb-4 border-2 border-gray-500">
+                        <div class="text-center w-full">
+                            <h2 class="text-4xl font-bold">${driver.name}</h2>
+                            <p class="text-xl text-gray-400">${driver.team}</p>
+                            <div class="mt-2 text-lg">
+                                <img src="https://thehenrym.github.io/images/flags/${driver.flagCountryCode}.svg" alt="${countryCodeToFullNameMap[driver.flagCountryCode]} flag" class="driver-flag">
+                                <span>${countryCodeToFullNameMap[driver.flagCountryCode]}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Stats and Achievements Column -->
+                    <div class="flex-1">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-center">
+                            <div class="bg-[#492833] p-4 rounded-lg shadow-inner">
+                                <p class="text-3xl font-extrabold">${driver.stats.racesStarted}</p>
+                                <p class="text-gray-300 uppercase text-sm">Races Started</p>
+                            </div>
+                            <div class="bg-[#492833] p-4 rounded-lg shadow-inner">
+                                <p class="text-3xl font-extrabold">${driver.stats.wins}</p>
+                                <p class="text-gray-300 uppercase text-sm">Wins</p>
+                            </div>
+                            <div class="bg-[#492833] p-4 rounded-lg shadow-inner">
+                                <p class="text-3xl font-extrabold">${driver.stats.poles}</p>
+                                <p class="text-gray-300 uppercase text-sm">Poles</p>
+                            </div>
+                            <div class="bg-[#492833] p-4 rounded-lg shadow-inner">
+                                <p class="text-3xl font-extrabold">${driver.stats.dnfs}</p>
+                                <p class="text-gray-300 uppercase text-sm">DNFs</p>
+                            </div>
+                            <div class="bg-[#492833] p-4 rounded-lg shadow-inner">
+                                <p class="text-3xl font-extrabold">${driver.podiums}</p>
+                                <p class="text-gray-300 uppercase text-sm">Podiums</p>
+                            </div>
+                            <div class="bg-[#492833] p-4 rounded-lg shadow-inner ${driver.championships > 0 ? 'championship-glow' : ''}">
+                                <p class="text-3xl font-extrabold">${driver.championships}</p>
+                                <p class="text-gray-300 uppercase text-sm">Championships</p>
+                            </div>
+                        </div>
+                        <div class="mt-8">
+                            <h3 class="text-2xl font-bold mb-2">BIOGRAPHY</h3>
+                            <p class="text-gray-300 leading-relaxed">
+                                ${driver.bio || 'Biography not available. Coming soon...'}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            teamsGrid.insertAdjacentHTML('beforeend', driverBioHtml);
+        }
+        
+        // This function handles the rendering of the team principal profile
+        function renderTeamPrincipalProfile(principalName) {
+            const teamsGrid = document.getElementById('schedule-grid');
+            const dynamicControlsContainer = document.getElementById('dynamic-controls-container');
+
+            dynamicControlsContainer.innerHTML = '';
+            teamsGrid.innerHTML = '';
+
+            const principal = allDriversData[principalName];
+            const team = teamData.find(t => t.teamPrincipal === principalName);
+
+            if (!principal || !team) {
+                console.error('Team principal or team not found:', principalName);
+                return;
+            }
+
+            const principalProfileHtml = `
+                <div class="w-full bg-[#201C1C] p-8 rounded-lg shadow-xl flex flex-col md:flex-row gap-8 text-white border-2 border-gray-400">
+                    <!-- Image and Basic Info Column -->
+                    <div class="flex-shrink-0 flex flex-col items-center w-full md:w-1/3">
+                        <img src="${principal.image}" alt="${principal.name}" class="w-full h-auto rounded-xl object-cover shadow-lg mb-4 border-2 border-gray-500">
+                        <div class="text-center w-full">
+                            <h2 class="text-4xl font-bold">${principal.name}</h2>
+                            <div class="bg-[#492833] text-white text-sm font-semibold px-3 py-1 rounded-full w-fit mx-auto mt-2">TEAM PRINCIPAL</div>
+                            <p class="text-xl text-gray-400 mt-2">${team.name}</p>
+                            <div class="mt-2 text-lg">
+                                <img src="https://thehenrym.github.io/images/flags/${principal.flagCountryCode}.svg" alt="${countryCodeToFullNameMap[principal.flagCountryCode]} flag" class="driver-flag">
+                                <span>${countryCodeToFullNameMap[principal.flagCountryCode]}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Additional Info and Team Details -->
+                    <div class="flex-1">
+                        <div class="mt-8">
+                            <h3 class="text-2xl font-bold mb-2">ABOUT THE TEAM PRINCIPAL</h3>
+                            <p class="text-gray-300 leading-relaxed">
+                                ${principal.bio || 'Biography for the team principal is not available. Coming soon...'}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            teamsGrid.insertAdjacentHTML('beforeend', principalProfileHtml);
+        }
+
+        // Function to render content based on URL hash
+        function renderContentBasedOnURL() {
+            const hash = window.location.hash.substring(1);
+            if (hash) {
+                const driverName = decodeURIComponent(hash);
+                // Check if the hash corresponds to a driver or a team principal
+                if (allDriversData[driverName]) {
+                    if (allDriversData[driverName].isTeamPrincipal) {
+                        renderTeamPrincipalProfile(driverName);
+                    } else {
+                        renderTeamProfile(driverName);
+                    }
+                } else {
+                    // Fallback to rendering the default teams view
+                    renderTeams();
+                }
+            } else {
+                renderTeams();
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            const teamsGrid = document.getElementById('schedule-grid');
+            const driverSearchInput = document.getElementById('driver-search');
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            // --- Menu toggle logic ---
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('menu-open');
+                mobileMenuButton.classList.toggle('open');
+            });
+
+            // --- Search and filtering logic ---
+            driverSearchInput.addEventListener('keyup', () => {
+                const searchTerm = driverSearchInput.value;
+                renderTeams(searchTerm);
+            });
+            
+            // --- Initial render logic ---
+            renderTeams();
+
+            // Event listener for driver and team principal name clicks to show profile
+            teamsGrid.addEventListener('click', (e) => {
+                const link = e.target.closest('.driver-name-link');
+                if (link) {
+                    const name = link.textContent.trim();
+                    if (allDriversData[name]) {
+                        window.location.hash = name;
+                    }
+                }
+            });
+
+            // Listen for hash changes to navigate between views without a full page reload
+            window.addEventListener('hashchange', () => {
+                renderContentBasedOnURL();
+            });
+
+        });
+    </script>
+</body>
+</html>

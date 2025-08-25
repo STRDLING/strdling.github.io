@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="icon" type="image/png" href="favicon/favicon-96x96.png" sizes="96x96" />
+<link rel="icon" type="image/svg+xml" href="favicon/favicon.svg" />
+<link rel="shortcut icon" href="favicon/favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-title" content="10 Controls" />
+<link rel="manifest" href="favicon/site.webmanifest" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>10 Controls</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            /* Updated background gradient from the Schedule page */
+            background: linear-gradient(to bottom, #492833, #201C1C);
+            min-height: 100vh;
+        }
+        .footer {
+            /* Updated footer background color from the Schedule page */
+            background-color: #492833;
+            color: white;
+            text-align: center;
+            padding: 2rem 1rem;
+        }
+        /* Styles for the staggered fade-in animation */
+        .content-fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .content-fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Styles for smooth hamburger menu transition */
+        #mobile-menu {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out;
+            position: absolute;
+            width: 100%;
+            left: 0;
+            top: 100%;
+            /* Updated background color from the Schedule page */
+            background-color: #492833;
+        }
+
+        #mobile-menu.menu-open {
+            max-height: 25rem;
+            opacity: 1;
+        }
+
+        /* Styles for the sliding navigation highlighter */
+        #desktop-menu-items {
+            position: relative;
+        }
+
+        #sliding-highlighter {
+            position: absolute;
+            top: 0;
+            left: 0; /* Will be set by JS */
+            width: 0; /* Will be set by JS */
+            height: 100%;
+            /* Updated header selector background color from the Schedule page */
+            background-color: #492833; /* Changed to match the dark red from Schedule page */
+            border-radius: 0.375rem; /* rounded-md */
+            transition: left 0.3s ease-in-out, width 0.3s ease-in-out;
+            z-index: -1; /* Place it behind the text */
+        }
+        
+        /* Hamburger Icon Animation */
+        .hamburger-icon span {
+            display: block;
+            width: 24px;
+            height: 2px;
+            background-color: white;
+            transition: all 0.3s cubic-bezier(.08,.82,.17,1);
+        }
+
+        #mobile-menu-button.open .hamburger-icon span:nth-child(1) {
+            transform: translateY(10px) rotate(45deg); /* Updated transform */
+        }
+        #mobile-menu-button.open .hamburger-icon span:nth-child(2) {
+            opacity: 0;
+        }
+        #mobile-menu-button.open .hamburger-icon span:nth-child(3) {
+            transform: translateY(-10px) rotate(-45deg); /* Updated transform */
+        }
+
+        /* Styles for the mobile menu link hover effect */
+        .mobile-menu-link {
+            background-color: #492833; /* The original dark red color */
+            transition: background-color 0.2s ease-in-out;
+        }
+        .mobile-menu-link:hover {
+            background-color: #2d2d2d; /* Changed from black to #2d2d2d */
+        }
+
+        /* Custom styles for driver flags and team icons */
+        .flag-icon {
+            width: 20px;
+            height: 15px; /* Standard flag aspect ratio */
+            border-radius: 2px; /* Slightly rounded corners for flags */
+            object-fit: cover;
+            flex-shrink: 0; /* Prevent shrinking in flex container */
+            margin-right: 8px; /* Space between flag and name */
+            border: 1px solid #ffc0cb; /* Changed border color to match the 'NEW' tag */
+            margin-top: -2px; /* Adjusted to align better with text baseline */
+        }
+        .team-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 9999px; /* rounded-full */
+            flex-shrink: 0;
+            margin-right: 8px; /* Space between icon and name */
+            object-fit: contain; /* Ensure logo fits within the circle */
+        }
+        .upcoming-race-flag {
+            width: 40px;
+            height: 30px;
+            border-radius: 4px;
+            object-fit: cover;
+            border: 1px solid #be8190;
+        }
+        /* Style for clickable titles with a persistent arrow */
+        .clickable-title {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem; /* Use gap for spacing */
+        }
+        .clickable-title h3 {
+            margin: 0; /* Reset margin on h3 to ensure proper alignment */
+            transition: color 0.3s ease-out;
+        }
+        .clickable-title:hover h3 {
+            color: #e2e8f0; /* Lighter gray on hover */
+        }
+
+        .clickable-title .arrow {
+            font-size: 1.5em; /* Adjusted arrow size */
+            line-height: 1;
+            color: #ffc0cb; /* Pink arrow */
+        }
+    </style>
+</head>
+<body class="font-medium">
+
+    <header class="bg-black/70 backdrop-blur-sm sticky top-0 z-50 shadow-lg">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex-shrink-0">
+                    <a href="index.html">
+                        <!-- Updated logo image source as requested -->
+                        <img src="images/10c.png" alt="10 Controls Logo" class="h-10">
+                    </a>
+                </div>
+
+                <div id="desktop-menu-items" class="hidden md:flex items-center space-x-4">
+                    <div id="sliding-highlighter"></div>
+                    <!-- 'Latest' link is active -->
+                    <a href="index.html" class="text-white px-3 py-2 rounded-md text-sm font-medium relative z-10" aria-current="page">Latest</a>
+                    <a href="schedule.html" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium relative z-10">Schedule</a>
+                    <a href="standings.html" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium relative z-10">Standings</a>
+                    <a href="teams.html" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium relative z-10">Teams</a>
+                </div>
+
+                <div class="-mr-2 flex md:hidden">
+                    <!-- Updated background and hover background color for mobile menu button -->
+                    <button type="button" id="mobile-menu-button" class="bg-[#492833] inline-flex items-center justify-center p-2 rounded-md text-white hover:bg-[#3a2029] focus:outline-none">
+                        <span class="sr-only">Open main menu</span>
+                        <div class="hamburger-icon space-y-2"> <!-- Changed from space-y-1.5 to space-y-2 -->
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </nav>
+        <div class="md:hidden" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <!-- 'Latest' link is active in mobile menu -->
+                <a href="index.html" class="bg-[#492833] text-white block px-3 py-2 rounded-md text-base font-medium mobile-menu-link" aria-current="page">Latest</a>
+                <a href="schedule.html" class="text-white block px-3 py-2 rounded-md text-base font-medium mobile-menu-link">Schedule</a>
+                <a href="standings.html" class="text-white block px-3 py-2 rounded-md text-base font-medium mobile-menu-link">Standings</a>
+                <a href="teams.html" class="text-white block px-3 py-2 rounded-md text-base font-medium mobile-menu-link">Teams</a>
+            </div>
+        </div>
+    </header>
+
+
+
+    <!-- Main Content Area - Latest Page Layout -->
+    <main class="relative max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 text-gray-900">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+            <!-- Featured Story Section (Left/Top) -->
+            <div id="featured-story-container" class="lg:col-span-2 bg-white rounded-lg shadow-lg overflow-hidden content-fade-in transform transition-transform duration-300">
+                <div class="relative w-full h-full">
+                    <img src="images/maxfan.png" alt="F1 Featured Story" class="w-full h-full object-cover rounded-t-lg object-bottom">
+                    <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-[#2d2d2d]/80 to-transparent">
+                        <h2 class="text-2xl sm:text-3xl font-bold leading-tight mb-2 text-white">MAXFAN WINS FIRST CHAMPIONSHIP</h2>
+                        <p class="text-gray-300 text-sm">WILL HE REPEAT IN SEASON 7 WITH NEW REGULATIONS?</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DRIVERS STANDINGS & TEAMS STANDINGS -->
+            <div id="standings-column" class="lg:col-span-1 space-y-8 flex flex-col justify-between">
+                <!-- DRIVERS STANDINGS -->
+                <div class="space-y-4 content-fade-in" style="transition-delay: 100ms;">
+                    <a href="standings.html" class="clickable-title">
+                        <h3 class="text-xl font-bold text-white">DRIVERS STANDINGS</h3>
+                        <span class="arrow">›</span>
+                    </a>
+                    <div id="drivers-standings-table" class="bg-[#2d2d2d] rounded-lg shadow-lg p-4 space-y-3 w-full transform transition-transform duration-300">
+                        <!-- Driver 1: MAXFAN (Polish) -->
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-sm font-bold text-white">1</span>
+                                <img src="https://flagcdn.com/w20/pl.png" alt="Poland Flag" class="flag-icon">
+                                <p class="text-sm font-semibold text-white">MAXFAN</p>
+                            </div>
+                            <span class="text-sm font-bold text-white">160 PTS</span>
+                        </div>
+                        <!-- Driver 2: FOCUSER (Spanish) -->
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-sm font-bold text-white">2</span>
+                                <img src="https://flagcdn.com/w20/es.png" alt="Spain Flag" class="flag-icon">
+                                <p class="text-sm font-semibold text-white">FOCUSER</p>
+                            </div>
+                            <span class="text-sm font-bold text-white">138 PTS</span>
+                        </div>
+                        <!-- Driver 3: ANTON CHEBOTAROV (Ukrainian) -->
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-sm font-bold text-white">3</span>
+                                <img src="https://flagcdn.com/w20/ua.png" alt="Ukraine Flag" class="flag-icon">
+                                <p class="text-sm font-semibold text-white">ANTON CHEBOTAROV</p>
+                            </div>
+                            <span class="text-sm font-bold text-white">106 PTS</span>
+                        </div>
+                        <!-- Driver 4: TONY SEROKA (Polish) -->
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-sm font-bold text-white">4</span>
+                                <img src="https://flagcdn.com/w20/nl.png" alt="Netherlands Flag" class="flag-icon">
+                                <p class="text-sm font-semibold text-white">ALPHAROMEO</p>
+                            </div>
+                            <span class="text-sm font-bold text-white">62 PTS</span>
+                        </div>
+                        <!-- Driver 5: MAX HOUSLEY (Great Britain) -->
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-sm font-bold text-white">5</span>
+                                <img src="https://flagcdn.com/w20/gb.png" alt="Great Britain Flag" class="flag-icon">
+                                <p class="text-sm font-semibold text-white">LUCA STEVENS</p>
+                            </div>
+                            <span class="text-sm font-bold text-white">55 PTS</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TEAMS STANDINGS -->
+                <div class="space-y-4 content-fade-in" style="transition-delay: 200ms;">
+                    <a href="standings.html#teams" class="clickable-title">
+                        <h3 class="text-xl font-bold text-white">TEAMS STANDINGS</h3>
+                        <span class="arrow">›</span>
+                    </a>
+                    <div id="teams-standings-table" class="bg-[#2d2d2d] rounded-lg shadow-lg p-4 space-y-3 w-full transform transition-transform duration-300">
+                        <!-- Team 1: HOT WHEELS MCLAREN -->
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-sm font-bold text-white">1</span>
+                                <img src="https://cdn.discordapp.com/emojis/1378699086982811679.webp?size=44" alt="McLaren Logo" class="team-icon"> 
+                                <p class="text-sm font-semibold text-white">HOT WHEELS MCLAREN</p>
+                            </div>
+                            <span class="text-sm font-bold text-white">287 PTS</span>
+                        </div>
+                        <!-- Team 2: NEWPORT ROLEX RED BULL -->
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-sm font-bold text-white">2</span>
+                                <img src="https://cdn.discordapp.com/emojis/1378696277180813312.webp?size=44" alt="Red Bull Logo" class="team-icon">
+                                <p class="text-sm font-semibold text-white">NEWPORT ROLEX RED BULL</p>
+                            </div>
+                            <span class="text-sm font-bold text-white">215 PTS</span>
+                        </div>
+                        <!-- Team 3: GUINNESS MERCEDES -->
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-sm font-bold text-white">3</span>
+                                <img src="https://cdn.discordapp.com/emojis/1215769484078354483.webp?size=44" alt="Mercedes Logo" class="team-icon">
+                                <p class="text-sm font-semibold text-white">LOCKHEED MARTIN AM</p>
+                            </div>
+                            <span class="text-sm font-bold text-white">111 PTS</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- UPCOMING RACES Section -->
+        <div class="mb-12 content-fade-in" style="transition-delay: 300ms;">
+            <a href="schedule.html" class="clickable-title mb-6">
+                <h3 class="text-xl font-bold text-white uppercase">Upcoming Races</h3>
+                <span class="arrow">›</span>
+            </a>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Race 1: United States GP -->
+                <div class="bg-[#2d2d2d] rounded-lg shadow-lg p-6 flex flex-col items-center text-center">
+                    <img src="https://flagcdn.com/w160/us.png" alt="USA Flag" class="upcoming-race-flag mb-4" onerror="this.onerror=null;this.src='https://placehold.co/40x30/cccccc/000000?text=US';">
+                    <p class="text-lg font-bold text-white uppercase">United States Grand Prix</p>
+                    <p class="text-md text-gray-300 uppercase">Austin</p>
+                    <p class="text-md font-semibold text-white mt-2 uppercase">AUG 15</p>
+                    <p class="text-md font-semibold text-white mt-1 uppercase">7PM BST</p>
+                </div>
+                <!-- Race 2: Mystery GP -->
+                <div class="bg-[#2d2d2d] rounded-lg shadow-lg p-6 flex flex-col items-center text-center">
+                    <img src="https://flagcdn.com/w160/al.png" alt="Albania Flag" class="upcoming-race-flag mb-4" onerror="this.onerror=null;this.src='https://placehold.co/40x30/cccccc/000000?text=AL';">
+                    <p class="text-lg font-bold text-white uppercase">Mystery Grand Prix</p>
+                    <p class="text-md text-gray-300 uppercase">Mystery</p>
+                    <p class="text-md font-semibold text-white mt-2 uppercase">AUG 22</p>
+                    <p class="text-md font-semibold text-white mt-1 uppercase">7PM BST</p>
+                </div>
+                <!-- Race 3: Hungarian GP -->
+                <div class="bg-[#2d2d2d] rounded-lg shadow-lg p-6 flex flex-col items-center text-center">
+                    <img src="https://flagcdn.com/w160/hu.png" alt="Hungary Flag" class="upcoming-race-flag mb-4" onerror="this.onerror=null;this.src='https://placehold.co/40x30/cccccc/000000?text=HU';">
+                    <p class="text-lg font-bold text-white uppercase">Hungarian Grand Prix</p>
+                    <p class="text-md text-gray-300 uppercase">Budapest</p>
+                    <p class="text-md font-semibold text-white mt-2 uppercase">AUG 29</p>
+                    <p class="text-md font-semibold text-white mt-1 uppercase">7PM BST</p>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- RECENT STREAM Section -->
+        <div class="content-fade-in" style="transition-delay: 400ms;">
+            <a href="https://www.youtube.com/watch?v=d27egYIcpw8" target="_blank" rel="noopener noreferrer" class="clickable-title mb-6">
+                <h3 class="text-xl font-bold text-white">RECENT BROADCAST</h3>
+                <span class="arrow">›</span>
+            </a>
+            <div class="bg-[#2d2d2d] rounded-lg shadow-lg p-6 transform transition-transform duration-300">
+                <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6">
+                    <!-- Twitch VOD thumbnail updated -->
+                    <img src="images/mqdefault_6s.webp" alt="Twitch Stream Thumbnail" class="w-full sm:w-auto h-32 sm:h-auto object-cover rounded-md">
+                    <div>
+                        <h4 class="text-lg font-bold text-white">Latest Broadcast from 10 Controls!</h4>
+                        <!-- Updated Watch Stream button color -->
+                        <a href="https://www.youtube.com/watch?v=d27egYIcpw8" target="_blank" rel="noopener noreferrer" class="inline-block mt-4 bg-[#492833] hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-md transition-colors">
+                            Watch
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Social Media Links Footer -->
+    <footer class="bg-black text-white text-center py-5 px-2 mt-8">
+        <div class="max-w-7xl mx-auto flex justify-center items-center space-x-6">
+            <a href="https://www.twitch.tv/10controls" target="_blank" rel="noopener noreferrer" class="text-white hover:text-gray-300 transition-colors" aria-label="Twitch"><i class="fab fa-twitch fa-lg"></i></a>
+            <a href="https://www.instagram.com/10controls/" target="_blank" rel="noopener noreferrer" class="text-white hover:text-gray-300 transition-colors" aria-label="Instagram"><i class="fab fa-instagram fa-lg"></i></a>
+            <a href="https://www.youtube.com/@10controls24" target="_blank" rel="noopener noreferrer" class="text-white hover:text-gray-300 transition-colors" aria-label="YouTube"><i class="fab fa-youtube fa-lg"></i></a>
+        </div>
+    </footer>
+    
+    <!-- Main Copyright Footer -->
+    <footer class="footer">
+        <p>© 2022-2025 10 Controls Limited</p>
+    </footer>
+    
+    <script>
+        window.onload = function() {
+            // --- Content population script ---
+            const contentElements = document.querySelectorAll('.content-fade-in');
+            setTimeout(() => {
+                contentElements.forEach(el => el.classList.add('visible'));
+            }, 100);
+
+            // --- Mobile menu toggle script ---
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('menu-open');
+                mobileMenuButton.classList.toggle('open');
+            });
+            
+            // --- Sliding highlighter script ---
+            const menuItemsContainer = document.getElementById('desktop-menu-items');
+            if (menuItemsContainer) {
+                const menuLinks = menuItemsContainer.querySelectorAll('a');
+                const highlighter = document.getElementById('sliding-highlighter');
+                // Active link is 'Latest' for this page, keeping consistency with current page
+                const activeLink = menuItemsContainer.querySelector('a[aria-current="page"]'); 
+                function setHighlighterToLink(link) {
+                    if (!link) return;
+                    highlighter.style.left = `${link.offsetLeft}px`;
+                    highlighter.style.width = `${link.offsetWidth}px`;
+                }
+                setHighlighterToLink(activeLink);
+                menuLinks.forEach(link => {
+                    link.addEventListener('mouseenter', () => setHighlighterToLink(link));
+                });
+                menuItemsContainer.addEventListener('mouseleave', () => {
+                    setHighlighterToLink(activeLink);
+                });
+            }
+
+
+            // --- Dynamically set heights and alignment ---
+            const featuredStoryContainer = document.getElementById('featured-story-container');
+            const standingsColumn = document.getElementById('standings-column');
+            // Updated selectors to use the new IDs
+            const driversStandingsTable = document.getElementById('drivers-standings-table');
+            const teamsStandingsTable = document.getElementById('teams-standings-table');
+
+
+            const adjustLayout = () => {
+                if (window.innerWidth >= 1024) { // Only run this logic on lg screens and up
+                    if (featuredStoryContainer && standingsColumn && driversStandingsTable && teamsStandingsTable) {
+                        const featuredImage = featuredStoryContainer.querySelector('img');
+
+                        const onImageLoad = () => {
+                            // Reset heights to allow natural content flow for measurement
+                            featuredStoryContainer.style.height = 'auto';
+                            driversStandingsTable.style.height = 'auto';
+                            teamsStandingsTable.style.height = 'auto';
+                            standingsColumn.style.height = 'auto';
+
+                            // Calculate total height of the standings column
+                            const standingsTotalHeight = standingsColumn.offsetHeight;
+
+                            // Apply this total height to the featured story container
+                            featuredStoryContainer.style.height = `${standingsTotalHeight}px`;
+
+                            // Ensure image within featured story container fills its new height
+                            featuredImage.style.height = '100%';
+                            featuredImage.style.objectFit = 'cover';
+                            featuredImage.style.objectPosition = 'bottom'; 
+
+                            // Ensure the standings column itself takes the measured height
+                            standingsColumn.style.height = `${standingsTotalHeight}px`;
+
+                            // Distribute space vertically if there's extra space within standingsColumn
+                            standingsColumn.style.display = 'flex';
+                            standingsColumn.style.flexDirection = 'column';
+                            standingsColumn.style.justifyContent = 'space-between';
+                        };
+
+                        if (featuredImage && (featuredImage.complete || featuredImage.naturalWidth > 0)) {
+                            onImageLoad();
+                        } else if (featuredImage) {
+                            featuredImage.onload = onImageLoad;
+                        }
+                    }
+                } else {
+                    // On smaller screens, reset any inline styles to let flexbox/grid handle it
+                     if (featuredStoryContainer) featuredStoryContainer.style.height = 'auto';
+                     if (standingsColumn) standingsColumn.style.height = 'auto';
+                }
+            };
+
+            // Initial adjustment
+            adjustLayout();
+            // Re-adjust on window resize to maintain responsiveness
+            window.addEventListener('resize', adjustLayout);
+        };
+    </script>
+</body>
+</html>
