@@ -22,6 +22,7 @@
 
     <div class="w-full max-w-lg bg-gray-800 text-white rounded-2xl shadow-xl flex flex-col h-[75vh]">
 
+        <!-- Chat Header -->
         <header class="bg-gray-900 text-white p-4 rounded-t-2xl flex items-center justify-between shadow-lg">
             <h1 class="text-xl font-bold">ArtyAI</h1>
             <div class="flex items-center space-x-2">
@@ -33,7 +34,9 @@
             </div>
         </header>
 
+        <!-- Chat Messages Container -->
         <main id="chat-container" class="flex-grow p-4 overflow-y-auto space-y-4">
+            <!-- Initial bot message -->
             <div class="flex justify-start">
                 <div class="bg-gray-700 text-gray-200 message-bubble rounded-bl-none">
                     Hello! My name is Artur Onyshchenko. How can I help you today?
@@ -41,6 +44,7 @@
             </div>
         </main>
 
+        <!-- Input Area -->
         <footer class="p-4 bg-gray-900 rounded-b-2xl border-t border-gray-700">
             <div class="flex items-center space-x-2">
                 <input type="text" id="user-input" placeholder="Type a message..." class="flex-grow rounded-full border border-gray-600 bg-gray-700 text-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all placeholder:text-gray-400">
@@ -60,6 +64,9 @@
             const userInput = document.getElementById('user-input');
             const sendBtn = document.getElementById('send-btn');
             
+            let gamesCounter = 0;
+
+            // Function to add a message to the chat
             function addMessage(text, isUser) {
                 const messageDiv = document.createElement('div');
                 const bubbleClass = isUser ? 'bg-blue-500 text-white justify-end rounded-br-none' : 'bg-gray-700 text-gray-200 justify-start rounded-bl-none';
@@ -71,24 +78,69 @@
                     </div>
                 `;
                 chatContainer.appendChild(messageDiv);
-                chatContainer.scrollTop = chatContainer.scrollHeight;
+                chatContainer.scrollTop = chatContainer.scrollHeight; // Auto-scroll to the bottom
             }
 
+            // Function to handle sending a message and getting API response
             async function sendMessage() {
                 const text = userInput.value.trim();
                 if (text === '') return;
 
                 const lowerCaseText = text.toLowerCase();
+
+                // Check if the user is asking the bot to play Fortnite
+                if (lowerCaseText.includes("fortnite") && (lowerCaseText.includes("play") || lowerCaseText.includes("wanna"))) {
+                    addMessage(text, true);
+                    userInput.value = '';
+                    addMessage("NO DUDE IM NOT FUCKING PLAYING FORTNITE", false);
+                    return; // Exit the function to prevent API call
+                }
+
+                // Check if the user is asking for the bot's name
                 if (lowerCaseText.includes("your name") || lowerCaseText.includes("who are you")) {
                     addMessage(text, true);
                     userInput.value = '';
                     addMessage("My name is Artur Onyshchenko of Las Vegas, Nevada", false);
-                    return;
+                    return; // Exit the function to prevent API call
                 }
 
-                addMessage(text, true);
-                userInput.value = '';
+                // Check if the user is asking what the bot is up to
+                if (lowerCaseText.includes("up to") || lowerCaseText.includes("doing") && (lowerCaseText.includes("you") || lowerCaseText.includes("are you"))) {
+                    addMessage(text, true);
+                    userInput.value = '';
+                    addMessage("not much", false);
+                    return; // Exit the function to prevent API call
+                }
 
+                // Check if the user is asking to play games
+                if (lowerCaseText.includes("play") && lowerCaseText.includes("games")) {
+                    gamesCounter++;
+                    addMessage(text, true);
+                    userInput.value = '';
+                    
+                    if (gamesCounter >= 5) {
+                         // Final response before the crash
+                        addMessage("That's it, man. I'm done with this conversation. Done.", false);
+                        // Deliberately cause an error to "crash" the page
+                        setTimeout(() => {
+                             null.someProperty = "crash";
+                        }, 1000); 
+                    } else if (gamesCounter === 4) {
+                        addMessage("Dude, seriously? I said no. Quit asking.", false);
+                    } else if (gamesCounter === 3) {
+                        addMessage("I don't know how to be more clear. The answer is still no.", false);
+                    } else if (gamesCounter === 2) {
+                        addMessage("I'm not in the mood for games. No.", false);
+                    } else if (gamesCounter === 1) {
+                        addMessage("Nah, not right now.", false);
+                    }
+                    return; // Exit the function to prevent API call
+                }
+
+                addMessage(text, true); // Add user's message
+                userInput.value = ''; // Clear the input
+
+                // Simulate bot typing with a loading indicator
                 const typingIndicator = document.createElement('div');
                 typingIndicator.className = 'flex justify-start items-center mb-2';
                 typingIndicator.innerHTML = `
@@ -103,6 +155,7 @@
                     const apiKey = "AIzaSyAkL5cZH_3BBEOTuQUNAEgJaFoqth-iZGU";
                     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
+                    // Construct the payload with system instruction for the persona
                     const payload = {
                         contents: [{ parts: [{ text: text }] }],
                         tools: [{ "google_search": {} }],
@@ -117,10 +170,12 @@
                         body: JSON.stringify(payload)
                     });
 
+                    // Check for specific 401 Unauthorized error
                     if (response.status === 401) {
                         throw new Error('API authentication failed. Please ensure your API key is valid.');
                     }
                     
+                    // Check for a successful response
                     if (!response.ok) {
                         throw new Error(`API error: ${response.status} ${response.statusText}`);
                     }
@@ -130,6 +185,7 @@
 
                     if (candidate && candidate.content?.parts?.[0]?.text) {
                         const botResponse = candidate.content.parts[0].text;
+                        // Remove typing indicator and add the bot's full response
                         chatContainer.removeChild(typingIndicator);
                         addMessage(botResponse, false); 
                     } else {
@@ -142,6 +198,7 @@
                 }
             }
 
+            // Listen for button click and Enter key press
             sendBtn.addEventListener('click', sendMessage);
             userInput.addEventListener('keydown', (event) => {
                 if (event.key === 'Enter') {
